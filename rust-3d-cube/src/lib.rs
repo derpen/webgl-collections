@@ -1,20 +1,15 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{console, WebGl2RenderingContext, WebGlProgram, WebGlShader};
+use wasm_bindgen::JsValue;
 
-// When the `wee_alloc` feature is enabled, this uses `wee_alloc` as the global
-// allocator.
-//
-// If you don't want to use `wee_alloc`, you can safely delete this.
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+mod shader_utils;
 
 #[wasm_bindgen(start)]
-fn start() -> Result<(), JsValue> {
+async fn start() -> Result<(), JsValue> {
     #[cfg(debug_assertions)]
     console_error_panic_hook::set_once();
 
-    console::log_1(&JsValue::from_str("Hello triangle!"));
+    //console::log_1(&JsValue::from_str("Hello triangle!"));
 
     let document = web_sys::window().unwrap().document().unwrap();
     let canvas = document.get_element_by_id("canvas").unwrap();
@@ -25,18 +20,13 @@ fn start() -> Result<(), JsValue> {
         .unwrap()
         .dyn_into::<WebGl2RenderingContext>()?;
 
+    let frag_shader_location = String::from("shaders/cube/cube.frag");
+    let frag_shader = shader_utils::read_shader(frag_shader_location).await;
+
     let vert_shader = compile_shader(
         &context,
         WebGl2RenderingContext::VERTEX_SHADER,
-        r##"#version 300 es
- 
-        in vec4 position;
-
-        void main() {
-        
-            gl_Position = position;
-        }
-        "##,
+        frag_shader.to_string(),
     )?;
 
     let frag_shader = compile_shader(
@@ -48,7 +38,7 @@ fn start() -> Result<(), JsValue> {
         out vec4 outColor;
         
         void main() {
-            outColor = vec4(1, 1, 1, 1);
+            outColor = vec4(1.0, .0, .0, 1.0);
         }
         "##,
     )?;
