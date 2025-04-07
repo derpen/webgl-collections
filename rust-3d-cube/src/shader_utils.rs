@@ -24,7 +24,7 @@ pub async fn read_shader(url_path: String) -> Result<JsValue, JsValue> {
     let resp: Response = resp_value.dyn_into().unwrap();
 
     // Convert this other `Promise` into a rust `Future`.
-    let json = JsFuture::from(resp.json()?).await?;
+    let json = JsFuture::from(resp.text()?).await?;
 
     // Send the JSON response back to JS.
     Ok(json)

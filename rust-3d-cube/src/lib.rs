@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{console, WebGl2RenderingContext, WebGlProgram, WebGlShader};
 use wasm_bindgen::JsValue;
+use js_sys;
 
 mod shader_utils;
 
@@ -21,27 +22,23 @@ async fn start() -> Result<(), JsValue> {
         .dyn_into::<WebGl2RenderingContext>()?;
 
     let frag_shader_location = String::from("shaders/cube/cube.frag");
-    let frag_shader = shader_utils::read_shader(frag_shader_location).await;
+    let frag_shader = shader_utils::read_shader(frag_shader_location).await.unwrap();
+
+    let vert_shader_location = String::from("shaders/cube/cube.vert");
+    let vert_shader = shader_utils::read_shader(vert_shader_location).await.unwrap();
 
     let vert_shader = compile_shader(
         &context,
         WebGl2RenderingContext::VERTEX_SHADER,
-        frag_shader.to_string(),
+        &vert_shader.as_string().unwrap(),
     )?;
 
     let frag_shader = compile_shader(
         &context,
         WebGl2RenderingContext::FRAGMENT_SHADER,
-        r##"#version 300 es
-    
-        precision highp float;
-        out vec4 outColor;
-        
-        void main() {
-            outColor = vec4(1.0, .0, .0, 1.0);
-        }
-        "##,
+        &frag_shader.as_string().unwrap(),
     )?;
+
     let program = link_program(&context, &vert_shader, &frag_shader)?;
     context.use_program(Some(&program));
 
