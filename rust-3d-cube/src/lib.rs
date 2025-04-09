@@ -17,7 +17,7 @@ async fn start() -> Result<(), JsValue> {
     let canvas = document.get_element_by_id("canvas").unwrap();
     let canvas: web_sys::HtmlCanvasElement = canvas.dyn_into::<web_sys::HtmlCanvasElement>()?;
 
-    let context: WebGl2RenderingContext = canvas
+    let context = canvas
         .get_context("webgl2")?
         .unwrap()
         .dyn_into::<WebGl2RenderingContext>()?;
@@ -25,7 +25,7 @@ async fn start() -> Result<(), JsValue> {
     // size
     let width_size = window.inner_width().unwrap();
     let height_size = window.inner_height().unwrap();
-    context.viewport(0, 0, 400, 300);
+    context.viewport(0, 0, width_size.as_f64().unwrap() as i32, height_size.as_f64().unwrap() as i32);
 
     let frag_shader_location = String::from("shaders/cube/cube.frag");
     let frag_shader = shader_utils::read_shader(frag_shader_location).await.unwrap();
