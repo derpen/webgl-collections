@@ -4,6 +4,7 @@ use wasm_bindgen::JsValue;
 use js_sys;
 
 mod shader_utils;
+mod gl_loop;
 
 #[wasm_bindgen(start)]
 async fn start() -> Result<(), JsValue> {
@@ -92,8 +93,11 @@ async fn start() -> Result<(), JsValue> {
 
     context.bind_vertex_array(Some(&vao));
 
+
     let vert_count = (vertices.len() / 3) as i32;
     draw(&context, vert_count);
+
+    gl_loop::animate();
 
     Ok(())
 }
