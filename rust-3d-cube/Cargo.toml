@@ -1,6 +1,6 @@
 # You must change these to your own details.
 [package]
-name = "rust-triangle-test"
+name = "rust_triangle_test"
 description = "Trying some shit out"
 version = "0.1.0"
 categories = ["wasm"]

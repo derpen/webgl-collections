@@ -79,3 +79,11 @@ pub fn link_program(
             .unwrap_or_else(|| String::from("Unknown error creating program object")))
     }
 }
+
+pub fn set_float(
+    context: &WebGl2RenderingContext,
+    name: String,
+    value: f32,
+) {
+    let shader_location = context.get_uniform_location(program, "cunt").unwrap();
+}
