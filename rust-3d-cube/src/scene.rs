@@ -1,10 +1,10 @@
 use wasm_bindgen::prelude::*;
-use web_sys::WebGl2RenderingContext;
+use web_sys::{WebGl2RenderingContext, console};
 use js_sys;
 use crate::shader_utils;
 
 #[wasm_bindgen]
-pub async fn triangle_init(context: &WebGl2RenderingContext) -> Result<(), JsValue> {
+pub async fn triangle_init(context: &WebGl2RenderingContext) -> Result<shader_utils::GlShader, JsValue> {
     let frag_shader_location = String::from("shaders/cube/cube.frag");
     let frag_shader = shader_utils::read_shader(frag_shader_location).await.unwrap();
 
@@ -23,7 +23,10 @@ pub async fn triangle_init(context: &WebGl2RenderingContext) -> Result<(), JsVal
         &frag_shader.as_string().unwrap(),
     )?;
 
-    let program = shader_utils::link_program(&context, &vert_shader, &frag_shader)?;
+    let mut gl_shader = shader_utils::GlShader::new(&context);
+
+    let program = gl_shader.link_program(&vert_shader, &frag_shader).unwrap();
+
     context.use_program(Some(&program));
 
     let vertices: [f32; 9] = [
@@ -70,17 +73,23 @@ pub async fn triangle_init(context: &WebGl2RenderingContext) -> Result<(), JsVal
 
     context.bind_vertex_array(Some(&vao));
 
-    let vert_count = (vertices.len() / 3) as i32;
-    draw(&context, vert_count);
+    //let vert_count = (vertices.len() / 3) as i32;
+    //draw(&context, vert_count);
 
-    Ok(())
+    Ok(gl_shader)
 }
 
-pub fn draw(context: &WebGl2RenderingContext, vert_count: i32) {
+pub fn draw(
+    context: &WebGl2RenderingContext, 
+    vert_count: i32,
+    delta: f64,
+    shader: shader_utils::GlShader
+) {
     context.clear(WebGl2RenderingContext::COLOR_BUFFER_BIT);
 
-    // Change u_time uniform here
-    //
+    //console::log_1(&JsValue::from_str("Is this looping"));
+
+    shader.set_float("u_time".to_string(), delta);
 
     context.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, vert_count);
 }

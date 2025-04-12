@@ -30,6 +30,63 @@ pub async fn read_shader(url_path: String) -> Result<JsValue, JsValue> {
     Ok(json)
 }
 
+#[derive(Clone)]
+#[wasm_bindgen]
+pub struct GlShader {
+    context: WebGl2RenderingContext,
+    shader_program: Option<WebGlProgram>,
+}
+
+impl GlShader {
+
+    pub fn new(
+        this_context: &WebGl2RenderingContext
+    ) -> Self {
+        GlShader {
+            context: this_context.clone(),
+            shader_program: None,
+        }
+    }
+
+    pub fn link_program(
+        &mut self,
+        vert_shader: &WebGlShader,
+        frag_shader: &WebGlShader,
+    ) -> Result<WebGlProgram, String> {
+        let program = self.context
+            .create_program()
+            .ok_or_else(|| String::from("Unable to create shader object"))?;
+
+        self.context.attach_shader(&program, vert_shader);
+        self.context.attach_shader(&program, frag_shader);
+        self.context.link_program(&program);
+
+        if self.context
+            .get_program_parameter(&program, WebGl2RenderingContext::LINK_STATUS)
+            .as_bool()
+            .unwrap_or(false)
+        {
+            self.shader_program = Some(program.clone());
+            Ok(program)
+        } else {
+            Err(self.context
+                .get_program_info_log(&program)
+                .unwrap_or_else(|| String::from("Unknown error creating program object")))
+        }
+    }
+
+    pub fn set_float(
+        &self,
+        name: String,
+        value: f64,
+    ) -> Result<(), String> {
+        let program = self.shader_program.as_ref().ok_or("Program is not set")?;
+        let shader_location = self.context.get_uniform_location(program, &name);
+        self.context.uniform1f(shader_location.as_ref(), value as f32);
+        Ok(())
+    }
+}
+
 pub fn compile_shader(
     context: &WebGl2RenderingContext,
     shader_type: u32,
@@ -52,38 +109,4 @@ pub fn compile_shader(
             .get_shader_info_log(&shader)
             .unwrap_or_else(|| String::from("Unknown error creating shader")))
     }
-}
-
-pub fn link_program(
-    context: &WebGl2RenderingContext,
-    vert_shader: &WebGlShader,
-    frag_shader: &WebGlShader,
-) -> Result<WebGlProgram, String> {
-    let program = context
-        .create_program()
-        .ok_or_else(|| String::from("Unable to create shader object"))?;
-
-    context.attach_shader(&program, vert_shader);
-    context.attach_shader(&program, frag_shader);
-    context.link_program(&program);
-
-    if context
-        .get_program_parameter(&program, WebGl2RenderingContext::LINK_STATUS)
-        .as_bool()
-        .unwrap_or(false)
-    {
-        Ok(program)
-    } else {
-        Err(context
-            .get_program_info_log(&program)
-            .unwrap_or_else(|| String::from("Unknown error creating program object")))
-    }
-}
-
-pub fn set_float(
-    context: &WebGl2RenderingContext,
-    name: String,
-    value: f32,
-) {
-    let shader_location = context.get_uniform_location(program, "cunt").unwrap();
 }

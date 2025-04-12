@@ -2,8 +2,9 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen::prelude::*;
-use web_sys::{console, WebGl2RenderingContext};
+use web_sys::{console,WebGl2RenderingContext,WebGlShader};
 use crate::scene;
+use crate::shader_utils;
 
 fn window() -> web_sys::Window {
     web_sys::window().expect("no global `window` exists")
@@ -22,9 +23,11 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
 }
 
 pub fn animate(
-    context: &WebGl2RenderingContext
+    context: &WebGl2RenderingContext,
+    shader: shader_utils::GlShader
 ){
     let start_time = performance().now();
+    let current_shader = Rc::new(shader.clone());
     let context_rc = Rc::new(context.clone());
 
     let f = Rc::new(RefCell::new(None));
@@ -33,7 +36,7 @@ pub fn animate(
     *g.borrow_mut() = Some(Closure::new(move || {
         // Loop shit here
         let elapsed_time = performance().now() - start_time;
-        render_loop(elapsed_time, &*context_rc);
+        render_loop(elapsed_time, &*context_rc, (*current_shader).clone());
 
         request_animation_frame(f.borrow().as_ref().unwrap());
 
@@ -44,10 +47,11 @@ pub fn animate(
 
 fn render_loop(
     delta: f64,
-    context: &WebGl2RenderingContext
+    context: &WebGl2RenderingContext,
+    shader: shader_utils::GlShader
 ) {
     console::log_1(&JsValue::from_str(&format!("Elapsed Time: {:2} seconds", delta / 1000.0)));
 
     context.clear_color(0.05, 0.05, 0.05, 1.0);
-    scene::draw(&context, 3);
+    scene::draw(&context, 3, delta, shader);
 }
