@@ -53,5 +53,5 @@ fn render_loop(
     console::log_1(&JsValue::from_str(&format!("Elapsed Time: {:2} seconds", delta / 1000.0)));
 
     context.clear_color(0.05, 0.05, 0.05, 1.0);
-    scene::draw(&context, 3, delta, shader);
+    scene::draw(&context, 3, delta / 1000.0, shader);
 }
