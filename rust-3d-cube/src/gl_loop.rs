@@ -55,3 +55,4 @@ fn render_loop(
     context.clear_color(0.05, 0.05, 0.05, 1.0);
     scene::draw(&context, 3, delta / 1000.0, shader);
 }
+

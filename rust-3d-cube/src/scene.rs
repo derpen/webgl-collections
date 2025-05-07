@@ -79,6 +79,12 @@ pub async fn triangle_init(context: &WebGl2RenderingContext) -> Result<shader_ut
     Ok(gl_shader)
 }
 
+//#[wasm_bindgen]
+//pub async fn cube_init(context: &WebGl2RenderingContext) -> Result<shader_utils::GlShader, JsValue> {
+//
+//    Ok(())
+//}
+
 pub fn draw(
     context: &WebGl2RenderingContext, 
     vert_count: i32,
