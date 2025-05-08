@@ -28,8 +28,19 @@ async fn start() -> Result<(), JsValue> {
     let height_size = window.inner_height().unwrap();
     context.viewport(0, 0, width_size.as_f64().unwrap() as i32, height_size.as_f64().unwrap() as i32);
 
-    let triangle_shader = scene::triangle_init(&context).await?; // TODO: can i not do this ignore bullshit
-    gl_loop::animate(&context, triangle_shader);
+    //let triangle_shader = scene::triangle_init(&context).await?; // TODO: can i not do this ignore bullshit
+    let triangle_shader = shader_utils::create_shader_program(
+        &context,
+        String::from("shaders/cube/cube.frag"),
+        String::from("shaders/cube/cube.vert")
+        ).await?; // TODO: can i not do this ignore bullshit
+                  //
+    context.use_program(Some(&triangle_shader));
+
+    let vao = scene::triangle_init(&context, triangle_shader).await?;
+    context.bind_vertex_array(Some(&vao));
+
+    gl_loop::animate(&context);
 
     Ok(())
 }

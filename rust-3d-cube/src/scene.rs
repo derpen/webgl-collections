@@ -1,40 +1,21 @@
 use wasm_bindgen::prelude::*;
-use web_sys::{WebGl2RenderingContext, console};
+use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlVertexArrayObject};
 use js_sys;
 use crate::shader_utils;
 
 #[wasm_bindgen]
-pub async fn triangle_init(context: &WebGl2RenderingContext) -> Result<shader_utils::GlShader, JsValue> {
-    let frag_shader_location = String::from("shaders/cube/cube.frag");
-    let frag_shader = shader_utils::read_shader(frag_shader_location).await.unwrap();
-
-    let vert_shader_location = String::from("shaders/cube/cube.vert");
-    let vert_shader = shader_utils::read_shader(vert_shader_location).await.unwrap();
-
-    let vert_shader = shader_utils::compile_shader(
-        &context,
-        WebGl2RenderingContext::VERTEX_SHADER,
-        &vert_shader.as_string().unwrap(),
-    )?;
-
-    let frag_shader = shader_utils::compile_shader(
-        &context,
-        WebGl2RenderingContext::FRAGMENT_SHADER,
-        &frag_shader.as_string().unwrap(),
-    )?;
-
-    let mut gl_shader = shader_utils::GlShader::new(&context);
-
-    let program = gl_shader.link_program(&vert_shader, &frag_shader).unwrap();
-
-    context.use_program(Some(&program));
-
+pub async fn triangle_init(
+    context: &WebGl2RenderingContext,
+    program: WebGlProgram,
+    ) -> Result<WebGlVertexArrayObject, JsValue> {
     let vertices: [f32; 9] = [
         -0.7, -0.7, 0.0, 
         0.7, -0.7, 0.0, 
         0.0, 0.7, 0.0];
 
-    let position_attribute_location = context.get_attrib_location(&program, "position");
+    let position_attribute_location = context.get_attrib_location(&program, "position"); // Why do
+                                                                                         // u need
+                                                                                         // program?
     let buffer = context.create_buffer().ok_or("Failed to create buffer")?;
     context.bind_buffer(WebGl2RenderingContext::ARRAY_BUFFER, Some(&buffer));
 
@@ -71,12 +52,10 @@ pub async fn triangle_init(context: &WebGl2RenderingContext) -> Result<shader_ut
     );
     context.enable_vertex_attrib_array(position_attribute_location as u32);
 
-    context.bind_vertex_array(Some(&vao));
-
     //let vert_count = (vertices.len() / 3) as i32;
     //draw(&context, vert_count);
 
-    Ok(gl_shader)
+    Ok(vao)
 }
 
 //#[wasm_bindgen]

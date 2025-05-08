@@ -110,3 +110,32 @@ pub fn compile_shader(
             .unwrap_or_else(|| String::from("Unknown error creating shader")))
     }
 }
+
+pub async fn create_shader_program(
+    context: &WebGl2RenderingContext,
+    fragment_location: String,
+    vertex_location: String,
+) -> Result<WebGlShader, JsValue>  {
+    let frag_shader_location = fragment_location;
+    let frag_shader = read_shader(frag_shader_location).await.unwrap();
+
+    let vert_shader_location = vertex_location;
+    let vert_shader = read_shader(vert_shader_location).await.unwrap();
+
+    let vert_shader = compile_shader(
+        &context,
+        WebGl2RenderingContext::VERTEX_SHADER,
+        &vert_shader.as_string().unwrap(),
+    )?;
+
+    let frag_shader = compile_shader(
+        &context,
+        WebGl2RenderingContext::FRAGMENT_SHADER,
+        &frag_shader.as_string().unwrap(),
+    )?;
+
+    let mut gl_shader = GlShader::new(&context);
+    let program = gl_shader.link_program(&vert_shader, &frag_shader).unwrap();
+
+    Ok(gl_shader)
+}
