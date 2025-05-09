@@ -40,7 +40,7 @@ async fn start() -> Result<(), JsValue> {
     let vao = scene::triangle_init(&context, triangle_shader.clone()).await?;
     context.bind_vertex_array(Some(&vao));
 
-    context.use_program(Some(&triangle_shader));
+    context.use_program(Some(&triangle_shader.get_shader_program().unwrap()));
     gl_loop::animate(&context, triangle_shader);
 
     Ok(())

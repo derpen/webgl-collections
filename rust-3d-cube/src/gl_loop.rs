@@ -24,8 +24,7 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
 
 pub fn animate(
     context: &WebGl2RenderingContext,
-    //shader: shader_utils::GlShader
-    shader: WebGlProgram
+    shader: shader_utils::GlShader
 ){
     let start_time = performance().now();
     let current_shader = Rc::new(shader.clone());
@@ -37,7 +36,7 @@ pub fn animate(
     *g.borrow_mut() = Some(Closure::new(move || {
         // Loop shit here
         let elapsed_time = performance().now() - start_time;
-        render_loop(elapsed_time, &*context_rc, *current_shader);
+        render_loop(elapsed_time, &*context_rc, (*current_shader).clone());
 
         request_animation_frame(f.borrow().as_ref().unwrap());
 
@@ -49,8 +48,7 @@ pub fn animate(
 fn render_loop(
     delta: f64,
     context: &WebGl2RenderingContext,
-    //shader: shader_utils::GlShader
-    shader: WebGlProgram
+    shader: shader_utils::GlShader
 ) {
     console::log_1(&JsValue::from_str(&format!("Elapsed Time: {:2} seconds", delta / 1000.0)));
 

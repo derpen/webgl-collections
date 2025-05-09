@@ -6,14 +6,14 @@ use crate::shader_utils;
 #[wasm_bindgen]
 pub async fn triangle_init(
     context: &WebGl2RenderingContext,
-    program: WebGlProgram,
+    program: shader_utils::GlShader,
     ) -> Result<WebGlVertexArrayObject, JsValue> {
     let vertices: [f32; 9] = [
         -0.7, -0.7, 0.0, 
         0.7, -0.7, 0.0, 
         0.0, 0.7, 0.0];
 
-    let position_attribute_location = context.get_attrib_location(&program, "position"); // Why do
+    let position_attribute_location = context.get_attrib_location(&program.get_shader_program().unwrap(), "position"); // Why do
                                                                                          // u need
                                                                                          // program?
     let buffer = context.create_buffer().ok_or("Failed to create buffer")?;
@@ -68,14 +68,13 @@ pub fn draw(
     context: &WebGl2RenderingContext, 
     vert_count: i32,
     delta: f64,
-    shader: WebGlProgram
-    //shader: shader_utils::GlShader
+    shader: shader_utils::GlShader
 ) {
     context.clear(WebGl2RenderingContext::COLOR_BUFFER_BIT);
 
     //console::log_1(&JsValue::from_str("Is this looping"));
 
-    //shader.set_float("u_time".to_string(), delta);
+    shader.set_float("u_time".to_string(), delta);
 
     context.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, vert_count);
 }

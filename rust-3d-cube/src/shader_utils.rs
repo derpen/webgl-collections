@@ -85,6 +85,10 @@ impl GlShader {
         self.context.uniform1f(shader_location.as_ref(), value as f32);
         Ok(())
     }
+
+    pub fn get_shader_program(&self) -> Option<WebGlProgram> {
+        self.shader_program.clone()
+    }
 }
 
 pub fn compile_shader(
@@ -115,7 +119,7 @@ pub async fn create_shader_program(
     context: &WebGl2RenderingContext,
     fragment_location: String,
     vertex_location: String,
-) -> Result<WebGlProgram, JsValue>  {
+) -> Result<GlShader, JsValue>  {
     let frag_shader_location = fragment_location;
     let frag_shader = read_shader(frag_shader_location).await.unwrap();
 
@@ -136,7 +140,7 @@ pub async fn create_shader_program(
 
     let mut gl_shader = GlShader::new(&context);
     let program = gl_shader.link_program(&vert_shader, &frag_shader).unwrap();
-    //gl_shader.shader_program = Some(program);
+    gl_shader.shader_program = Some(program.clone());
 
-    Ok(program)
+    Ok(gl_shader)
 }
