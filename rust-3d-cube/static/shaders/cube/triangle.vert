@@ -1,8 +1,6 @@
 #version 300 es
 
 in vec4 position;
-in vec3 normal;
-in vec2 texcoord;
 
 void main() {
   gl_Position = position;

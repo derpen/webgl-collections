@@ -28,20 +28,34 @@ async fn start() -> Result<(), JsValue> {
     let height_size = window.inner_height().unwrap();
     context.viewport(0, 0, width_size.as_f64().unwrap() as i32, height_size.as_f64().unwrap() as i32);
 
+    //let vert_shader = String::from("shaders/cube/triangle.frag");
+    //let frag_shader = String::from("shaders/cube/triangle.vert");
+    //
+    //let triangle_shader = shader_utils::create_shader_program(
+    //    &context,
+    //    vert_shader,
+    //    frag_shader
+    //    ).await?; // TODO: can i not do this ignore bullshit
+    //
+    //let vao = scene::triangle_init(&context, triangle_shader.clone()).await?;
+    //context.bind_vertex_array(Some(&vao));
+    //
+    //context.use_program(Some(&triangle_shader.get_shader_program().unwrap()));
+
     let vert_shader = String::from("shaders/cube/cube.frag");
     let frag_shader = String::from("shaders/cube/cube.vert");
 
-    let triangle_shader = shader_utils::create_shader_program(
+    let cube_shader = shader_utils::create_shader_program(
         &context,
         vert_shader,
         frag_shader
         ).await?; // TODO: can i not do this ignore bullshit
 
-    let vao = scene::triangle_init(&context, triangle_shader.clone()).await?;
+    let vao = scene::cube_init(&context, cube_shader.clone()).await?;
     context.bind_vertex_array(Some(&vao));
 
-    context.use_program(Some(&triangle_shader.get_shader_program().unwrap()));
-    gl_loop::animate(&context, triangle_shader);
+    context.use_program(Some(&cube_shader.get_shader_program().unwrap()));
+    gl_loop::animate(&context, cube_shader);
 
     Ok(())
 }
