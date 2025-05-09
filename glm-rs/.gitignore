@@ -1,5 +1,0 @@
-*.swp
-.DS_Store
-Cargo.lock
-Session.vim
-target
