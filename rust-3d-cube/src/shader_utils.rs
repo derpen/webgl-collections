@@ -115,7 +115,7 @@ pub async fn create_shader_program(
     context: &WebGl2RenderingContext,
     fragment_location: String,
     vertex_location: String,
-) -> Result<WebGlShader, JsValue>  {
+) -> Result<WebGlProgram, JsValue>  {
     let frag_shader_location = fragment_location;
     let frag_shader = read_shader(frag_shader_location).await.unwrap();
 
@@ -136,6 +136,7 @@ pub async fn create_shader_program(
 
     let mut gl_shader = GlShader::new(&context);
     let program = gl_shader.link_program(&vert_shader, &frag_shader).unwrap();
+    //gl_shader.shader_program = Some(program);
 
-    Ok(gl_shader)
+    Ok(program)
 }

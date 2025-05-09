@@ -68,13 +68,14 @@ pub fn draw(
     context: &WebGl2RenderingContext, 
     vert_count: i32,
     delta: f64,
-    shader: shader_utils::GlShader
+    shader: WebGlProgram
+    //shader: shader_utils::GlShader
 ) {
     context.clear(WebGl2RenderingContext::COLOR_BUFFER_BIT);
 
     //console::log_1(&JsValue::from_str("Is this looping"));
 
-    shader.set_float("u_time".to_string(), delta);
+    //shader.set_float("u_time".to_string(), delta);
 
     context.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, vert_count);
 }
