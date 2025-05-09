@@ -1,3 +1,0 @@
-[submodule "rust-3d-cube/glm-rs"]
-	path = rust-3d-cube/glm-rs
-	url = https://github.com/dche/glm-rs.git
