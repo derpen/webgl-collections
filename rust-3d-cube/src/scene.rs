@@ -2,6 +2,8 @@ use wasm_bindgen::prelude::*;
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlVertexArrayObject};
 use js_sys;
 use crate::shader_utils;
+use glm::{Mat4, Vector3, Vector4};
+use glm::ext::rotate;
 
 #[wasm_bindgen]
 pub async fn triangle_init(
@@ -161,7 +163,7 @@ pub async fn cube_init(
         32,
         12,
     );
-    context.enable_vertex_attrib_array(position_attribute_location as u32);
+    context.enable_vertex_attrib_array(normal_attribute_location as u32);
 
     context.vertex_attrib_pointer_with_i32(
         text_coord_attribute_location as u32,
@@ -171,7 +173,7 @@ pub async fn cube_init(
         32,
         24,
     );
-    context.enable_vertex_attrib_array(position_attribute_location as u32);
+    context.enable_vertex_attrib_array(text_coord_attribute_location as u32);
 
     Ok(vao)
 }
@@ -187,6 +189,17 @@ pub fn draw(
     //console::log_1(&JsValue::from_str("Is this looping"));
 
     let _ = shader.set_float("u_time".to_string(), delta);
+
+    let mut model: Mat4 = Mat4::new(
+        Vector4::new(1.0, 0.0, 0.0, 0.0),
+        Vector4::new(0.0, 1.0, 0.0, 0.0),
+        Vector4::new(0.0, 0.0, 1.0, 0.0),
+        Vector4::new(0.0, 0.0, 0.0, 1.0),
+    );
+
+    model = rotate(&model, 45.0, Vector3::new(1.0, 1.0, 0.0));
+
+    let _ = shader.set_mat4("model".to_string(), model);
 
     context.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, vert_count);
 }

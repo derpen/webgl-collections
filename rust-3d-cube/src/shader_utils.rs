@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response, WebGlProgram, WebGlShader, WebGl2RenderingContext};
+use glm::{Mat4, Vector4};
 
 #[wasm_bindgen]
 pub async fn read_shader(url_path: String) -> Result<JsValue, JsValue> {
@@ -88,6 +89,29 @@ impl GlShader {
 
     pub fn get_shader_program(&self) -> Option<WebGlProgram> {
         self.shader_program.clone()
+    }
+
+    pub fn set_mat4(
+        &self,
+        name: String,
+        value: Mat4,
+    ) -> Result<(), String> {
+        let program = self.shader_program.as_ref().ok_or("Program is not set")?;
+        let shader_location = self.context.get_uniform_location(program, &name);
+
+        // FUCK THIS GLM
+        // MAYBE TRY GLAM INSTEAD
+        // BUT THIS SHIT IS NOT GLM, SO IDK HONESTLY
+        // https://github.com/bitshifter/glam-rs
+        let array: [Vector4<f32>; 4] = *value.as_array();
+        let flat_array: [f32; 16] = [
+            array[0][0], array[0][1], array[0][2], array[0][3],
+            array[1][0], array[1][1], array[1][2], array[1][3],
+            array[2][0], array[2][1], array[2][2], array[2][3],
+            array[3][0], array[3][1], array[3][2], array[3][3],
+        ];
+        self.context.uniform_matrix4fv_with_f32_array(shader_location.as_ref(), false, &flat_array);
+        Ok(())
     }
 }
 
