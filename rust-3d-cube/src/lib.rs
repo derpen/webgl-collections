@@ -43,6 +43,8 @@ async fn start() -> Result<(), JsValue> {
     //
     //context.use_program(Some(&triangle_shader.get_shader_program().unwrap()));
 
+    context.enable(WebGl2RenderingContext::DEPTH_TEST);
+
     let vert_shader = String::from("shaders/cube/cube.frag");
     let frag_shader = String::from("shaders/cube/cube.vert");
 
@@ -54,7 +56,6 @@ async fn start() -> Result<(), JsValue> {
 
     let vao = scene::cube_init(&context, cube_shader.clone()).await?;
     context.bind_vertex_array(Some(&vao));
-
     context.use_program(Some(&cube_shader.get_shader_program().unwrap()));
     gl_loop::animate(&context, cube_shader);
 

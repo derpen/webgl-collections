@@ -76,6 +76,10 @@ impl GlShader {
         }
     }
 
+    pub fn get_shader_program(&self) -> Option<WebGlProgram> {
+        self.shader_program.clone()
+    }
+
     pub fn set_float(
         &self,
         name: String,
@@ -87,8 +91,15 @@ impl GlShader {
         Ok(())
     }
 
-    pub fn get_shader_program(&self) -> Option<WebGlProgram> {
-        self.shader_program.clone()
+    pub fn set_int(
+        &self,
+        name: String,
+        value: i32,
+    ) -> Result <(), String> {
+        let program = self.shader_program.as_ref().ok_or("Program is not set")?;
+        let shader_location = self.context.get_uniform_location(program, &name);
+        self.context.uniform1i(shader_location.as_ref(), value);
+        Ok(())
     }
 
     pub fn set_mat4(

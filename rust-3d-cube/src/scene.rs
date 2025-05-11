@@ -1,5 +1,5 @@
 use wasm_bindgen::prelude::*;
-use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlVertexArrayObject};
+use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlVertexArrayObject, HtmlImageElement};
 use js_sys;
 use crate::shader_utils;
 use crate::camera;
@@ -176,7 +176,56 @@ pub async fn cube_init(
     );
     context.enable_vertex_attrib_array(text_coord_attribute_location as u32);
 
+    // Handle textures
+    // TODO: these entire thing can probably be moved to another function
+    let image_buffer = context
+        .create_buffer()
+        .ok_or("Could not create vertex array object")?;
+    context.bind_buffer(WebGl2RenderingContext::ARRAY_BUFFER, Some(&image_buffer));
+    let texture = context.create_texture().ok_or("Could not create texture")?;
+    context.bind_texture(WebGl2RenderingContext::TEXTURE_2D, Some(&texture));
+    context.tex_parameteri(
+        WebGl2RenderingContext::TEXTURE_2D, 
+        WebGl2RenderingContext::TEXTURE_WRAP_S, 
+        WebGl2RenderingContext::REPEAT as i32
+        );
+    context.tex_parameteri(
+        WebGl2RenderingContext::TEXTURE_2D, 
+        WebGl2RenderingContext::TEXTURE_WRAP_T, 
+        WebGl2RenderingContext::REPEAT as i32
+        );
+    context.tex_parameteri(
+        WebGl2RenderingContext::TEXTURE_2D, 
+        WebGl2RenderingContext::TEXTURE_MIN_FILTER, 
+        WebGl2RenderingContext::LINEAR as i32
+        );
+    context.tex_parameteri(
+        WebGl2RenderingContext::TEXTURE_2D, 
+        WebGl2RenderingContext::TEXTURE_MAG_FILTER, 
+        WebGl2RenderingContext::LINEAR as i32
+        );
+
+    let picture = read_texture(String::from("images/image.jpg")).await?;
+
+    let _ = context.tex_image_2d_with_u32_and_u32_and_html_image_element(
+        WebGl2RenderingContext::TEXTURE_2D,
+        0,
+        WebGl2RenderingContext::RGBA as i32,
+        WebGl2RenderingContext::RGBA,
+        WebGl2RenderingContext::UNSIGNED_BYTE,
+        &picture
+    );
+    context.generate_mipmap(WebGl2RenderingContext::TEXTURE_2D);
+    context.active_texture(WebGl2RenderingContext::TEXTURE0);
+
     Ok(vao)
+}
+
+#[wasm_bindgen]
+pub async fn read_texture(url_path: String) -> Result<HtmlImageElement, JsValue> {
+    let image = HtmlImageElement::new().unwrap();
+    image.set_src(&url_path);
+    Ok(image)
 }
 
 pub fn draw(
@@ -206,13 +255,15 @@ pub fn draw(
     let _ = shader.set_mat4("model".to_string(), model);
 
     // Cringe temporary hack to use camera
-    // Please make it so that it doesn't have to reinitialize each time
+    // TODO: Please make it so that it doesn't have to reinitialize each time
     let camera = camera::Camera::new(Vector3::new(0.0, 0.0, 5.0)); // Wow this naming suck
     let view_matrix = camera.get_view_matrix();
     let projection_matrix = camera.get_projection_matrix();
 
     let _ = shader.set_mat4("view".to_string(), view_matrix);
     let _ = shader.set_mat4("projection".to_string(), projection_matrix);
+
+    let _ = shader.set_int("image".to_string(), 0);
 
     context.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, vert_count);
 }
