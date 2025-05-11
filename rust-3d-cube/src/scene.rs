@@ -2,8 +2,9 @@ use wasm_bindgen::prelude::*;
 use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlVertexArrayObject};
 use js_sys;
 use crate::shader_utils;
-use glm::{Mat4, Vector3, Vector4};
-use glm::ext::rotate;
+use crate::camera;
+use glm::{Mat4, Vector3, Vector4, radians};
+use glm::ext::{rotate, translate};
 
 #[wasm_bindgen]
 pub async fn triangle_init(
@@ -197,9 +198,21 @@ pub fn draw(
         Vector4::new(0.0, 0.0, 0.0, 1.0),
     );
 
-    model = rotate(&model, 45.0, Vector3::new(1.0, 1.0, 0.0));
+    model = rotate(&model, radians(45.0) + delta as f32, Vector3::new(1.0, 1.0, 0.0)); // Why does
+                                                                                       // plus
+                                                                                       // works
+    model = translate(&model, Vector3::new(0.0, -0.5, 0.0));
 
     let _ = shader.set_mat4("model".to_string(), model);
+
+    // Cringe temporary hack to use camera
+    // Please make it so that it doesn't have to reinitialize each time
+    let camera = camera::Camera::new(Vector3::new(0.0, 0.0, 5.0)); // Wow this naming suck
+    let view_matrix = camera.get_view_matrix();
+    let projection_matrix = camera.get_projection_matrix();
+
+    let _ = shader.set_mat4("view".to_string(), view_matrix);
+    let _ = shader.set_mat4("projection".to_string(), projection_matrix);
 
     context.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, vert_count);
 }

@@ -5,6 +5,7 @@ use wasm_bindgen::JsValue;
 mod shader_utils;
 mod gl_loop;
 mod scene;
+mod camera;
 
 #[wasm_bindgen(start)]
 async fn start() -> Result<(), JsValue> {

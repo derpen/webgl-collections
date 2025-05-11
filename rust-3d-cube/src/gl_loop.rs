@@ -45,6 +45,9 @@ pub fn animate(
     request_animation_frame(g.borrow().as_ref().unwrap());
 }
 
+// TODO
+// This is not delta
+// It's just time elapsed
 fn render_loop(
     delta: f64,
     context: &WebGl2RenderingContext,
@@ -53,6 +56,8 @@ fn render_loop(
     console::log_1(&JsValue::from_str(&format!("Elapsed Time: {:2} seconds", delta / 1000.0)));
 
     context.clear_color(0.05, 0.05, 0.05, 1.0);
+
+    // TODO: Maybe draw shouldn't take any arguments
     scene::draw(&context, 36, delta / 1000.0, shader); // TODO: this vertex count draw needs to be
                                                        // moved somewhere
 }

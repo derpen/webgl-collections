@@ -8,9 +8,11 @@ out vec3 Normal;
 out vec2 TexCoord;
 
 uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main() {
-  gl_Position = model * position;
+  gl_Position = projection * view * model * position;
   Normal = normal;
   TexCoord = texcoord;
 }
