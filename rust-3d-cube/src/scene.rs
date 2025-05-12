@@ -176,8 +176,17 @@ pub async fn cube_init(
     );
     context.enable_vertex_attrib_array(text_coord_attribute_location as u32);
 
-    // Handle textures
-    // TODO: these entire thing can probably be moved to another function
+    let _ = read_texture(&context, String::from("images/image.jpg")).await;
+
+    Ok(vao)
+}
+
+#[wasm_bindgen]
+pub async fn read_texture(
+    context: &WebGl2RenderingContext,
+    url_path: String
+    ) -> Result<(), JsValue> {
+    // Setting image buffers and shits
     let image_buffer = context
         .create_buffer()
         .ok_or("Could not create vertex array object")?;
@@ -205,27 +214,30 @@ pub async fn cube_init(
         WebGl2RenderingContext::LINEAR as i32
         );
 
-    let picture = read_texture(String::from("images/image.jpg")).await?;
-
-    let _ = context.tex_image_2d_with_u32_and_u32_and_html_image_element(
-        WebGl2RenderingContext::TEXTURE_2D,
-        0,
-        WebGl2RenderingContext::RGBA as i32,
-        WebGl2RenderingContext::RGBA,
-        WebGl2RenderingContext::UNSIGNED_BYTE,
-        &picture
-    );
-    context.generate_mipmap(WebGl2RenderingContext::TEXTURE_2D);
-    context.active_texture(WebGl2RenderingContext::TEXTURE0);
-
-    Ok(vao)
-}
-
-#[wasm_bindgen]
-pub async fn read_texture(url_path: String) -> Result<HtmlImageElement, JsValue> {
+    // Actually handling the texture reading
     let image = HtmlImageElement::new().unwrap();
     image.set_src(&url_path);
-    Ok(image)
+
+    let image_clone = image.clone();
+    let context_clone = context.clone();
+
+    let onload_callback = Closure::wrap(Box::new(move || {
+        let _ = context_clone.tex_image_2d_with_u32_and_u32_and_html_image_element(
+            WebGl2RenderingContext::TEXTURE_2D,
+            0,
+            WebGl2RenderingContext::RGBA as i32,
+            WebGl2RenderingContext::RGBA,
+            WebGl2RenderingContext::UNSIGNED_BYTE,
+            &image_clone
+        );
+    }) as Box<dyn FnMut()>);
+
+    image.set_onload(Some(onload_callback.as_ref().unchecked_ref()));
+    onload_callback.forget();
+    //context.generate_mipmap(WebGl2RenderingContext::TEXTURE_2D);
+    context.active_texture(WebGl2RenderingContext::TEXTURE0);
+
+    Ok(())
 }
 
 pub fn draw(
