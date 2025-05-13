@@ -19,6 +19,16 @@ async fn start() -> Result<(), JsValue> {
     let canvas = document.get_element_by_id("canvas").unwrap();
     let canvas: web_sys::HtmlCanvasElement = canvas.dyn_into::<web_sys::HtmlCanvasElement>()?;
 
+    let width = canvas.client_width();
+    let height = canvas.client_height();
+
+    canvas.set_width(width as u32);
+    canvas.set_height(height as u32);
+
+    //console::log_1(&format!("{} {}", width, height).into());
+
+    let gl_config = gl_loop::GlConfig::new(width, height, &canvas);
+
     let context = canvas
         .get_context("webgl2")?
         .unwrap()
@@ -57,7 +67,7 @@ async fn start() -> Result<(), JsValue> {
     let vao = scene::cube_init(&context, cube_shader.clone()).await?;
     context.bind_vertex_array(Some(&vao));
     context.use_program(Some(&cube_shader.get_shader_program().unwrap()));
-    gl_loop::animate(&context, cube_shader);
+    gl_loop::animate(&context, cube_shader, gl_config);
 
     Ok(())
 }

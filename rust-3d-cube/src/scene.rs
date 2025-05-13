@@ -1,8 +1,9 @@
 use wasm_bindgen::prelude::*;
-use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlVertexArrayObject, HtmlImageElement};
+use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlVertexArrayObject, HtmlImageElement, console};
 use js_sys;
 use crate::shader_utils;
 use crate::camera;
+use crate::gl_loop;
 use glm::{Mat4, Vector3, Vector4, radians};
 use glm::ext::{rotate, translate};
 
@@ -176,6 +177,7 @@ pub async fn cube_init(
     );
     context.enable_vertex_attrib_array(text_coord_attribute_location as u32);
 
+    // This probably should be moved somewhere else for better visibility
     let _ = read_texture(&context, String::from("images/image.jpg")).await;
 
     Ok(vao)
@@ -244,8 +246,13 @@ pub fn draw(
     context: &WebGl2RenderingContext, 
     vert_count: i32,
     delta: f64,
-    shader: shader_utils::GlShader
+    shader: shader_utils::GlShader,
+    config: gl_loop::GlConfig
 ) {
+    resize_canvas(&config, &context);
+
+    context.clear_color(0.05, 0.05, 0.05, 1.0);
+
     context.clear(WebGl2RenderingContext::COLOR_BUFFER_BIT);
 
     //console::log_1(&JsValue::from_str("Is this looping"));
@@ -268,7 +275,11 @@ pub fn draw(
 
     // Cringe temporary hack to use camera
     // TODO: Please make it so that it doesn't have to reinitialize each time
-    let camera = camera::Camera::new(Vector3::new(0.0, 0.0, 5.0)); // Wow this naming suck
+    let camera = camera::Camera::new( // Wow this naming suck
+        Vector3::new(0.0, 0.0, 5.0),
+        config.get_canvas().client_width() as f32,
+        config.get_canvas().client_height() as f32
+        ); 
     let view_matrix = camera.get_view_matrix();
     let projection_matrix = camera.get_projection_matrix();
 
@@ -280,3 +291,21 @@ pub fn draw(
     context.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, vert_count);
 }
 
+fn resize_canvas(
+    config: &gl_loop::GlConfig,
+    context: &WebGl2RenderingContext
+    ) {
+    let current_canvas = config.get_canvas();
+    let previous_width = config.get_width();
+    let previous_height = config.get_height();
+    if previous_width != current_canvas.client_width() || previous_height != current_canvas.client_height() {
+        console::log_1(&JsValue::from_str("We set a new canvas size one here"));
+        current_canvas.set_width(current_canvas.client_width() as u32);
+        current_canvas.set_height(current_canvas.client_height() as u32);
+        context.viewport(0, 0, current_canvas.client_width(), current_canvas.client_height());
+
+        // TODO: need this to work somehow
+        // As of now, its working, but this keep firing since I didn't update the real thing
+        //config.set_new_canvas_size(current_canvas.client_width(), current_canvas.client_height());
+    }
+}

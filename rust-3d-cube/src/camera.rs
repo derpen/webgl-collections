@@ -10,11 +10,15 @@ pub struct Camera {
   pub pitch: f32,
   pub sensitivity: f32,
   pub fov: f32,
+  pub width: f32,
+  pub height: f32,
 }
 
 impl Camera {
     pub fn new(
-        new_position: Vector3<f32>
+        new_position: Vector3<f32>,
+        new_width: f32,
+        new_height: f32,
     ) -> Self {
         Camera {
           position: new_position,
@@ -24,7 +28,9 @@ impl Camera {
           yaw: -90.0,
           pitch: 0.0,
           sensitivity: 0.1,
-          fov: 45.0
+          fov: 45.0,
+          width: new_width,
+          height: new_height
         }
     }
 
@@ -35,6 +41,6 @@ impl Camera {
     pub fn get_projection_matrix(&self) -> Mat4 {
         // TODO:
         // handle resolution/viewport or whatever its called
-        perspective(radians(self.fov), 800.0 / 600.0, 0.001, 1000.0)
+        perspective(radians(self.fov), self.width / self.height, 0.001, 1000.0)
     }
 }
