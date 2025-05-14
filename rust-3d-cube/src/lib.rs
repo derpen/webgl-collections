@@ -67,6 +67,16 @@ async fn start() -> Result<(), JsValue> {
     let vao = scene::cube_init(&context, cube_shader.clone()).await?;
     context.bind_vertex_array(Some(&vao));
     context.use_program(Some(&cube_shader.get_shader_program().unwrap()));
+
+    // Can we call the callback here?
+    //canvas.add_event_listener_with_callback("keydown")
+    let keydown_callback = Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
+        // Handle keydown event
+        scene::handle_input(event);
+    }) as Box<dyn FnMut(_)>);
+    let _ = canvas.clone().add_event_listener_with_callback("keydown", keydown_callback.as_ref().unchecked_ref());
+    keydown_callback.forget();
+
     gl_loop::animate(&context, cube_shader, gl_config);
 
     Ok(())

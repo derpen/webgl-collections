@@ -42,6 +42,8 @@ features = [
   'console',
   'Document',
   'Element',
+  'EventTarget',
+  'KeyboardEvent',
   'HtmlCanvasElement',
   'HtmlImageElement',
   'HtmlElement',

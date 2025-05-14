@@ -6,6 +6,11 @@ use web_sys::{console,WebGl2RenderingContext,WebGlShader,WebGlProgram, HtmlCanva
 use crate::scene;
 use crate::shader_utils;
 
+// This entire file is just to set up the Loop
+// Honestly, the file name is very misleading
+// The entire code is messy too, will need to rewrite this at some point
+// Real loop code happens in scene.rs
+
 #[derive(Clone)]
 #[wasm_bindgen]
 pub struct GlConfig {

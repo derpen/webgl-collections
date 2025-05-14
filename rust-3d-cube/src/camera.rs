@@ -43,4 +43,69 @@ impl Camera {
         // handle resolution/viewport or whatever its called
         perspective(radians(self.fov), self.width / self.height, 0.001, 1000.0)
     }
+
+    pub fn process_keyboard(&self) {
+
+    }
+
+    //void ProcessKeyboard(MoveDirection direction, float deltaTime){
+    //  float velocity = Speed * deltaTime;
+    //  if(direction == FORWARD)
+    //    Position += Front * velocity;
+    //
+    //  if(direction == BACKWARD)
+    //    Position -= Front * velocity;
+    //
+    //  if(direction == RIGHT)
+    //    Position += Right * velocity;
+    //
+    //  if(direction == LEFT)
+    //    Position -= Right * velocity;
+    //}
+    //
+    //void ProcessMouseMovement(double xPosIn, double yPosIn){
+    //  float xpos = static_cast<float>(xPosIn);
+    //  float ypos = static_cast<float>(yPosIn);
+    //
+    //  if(FirstMouse){
+    //    LastX = xpos;
+    //    LastY = ypos;
+    //    FirstMouse = false;
+    //  }
+    //
+    //  float xoffset = xpos - LastX;
+    //  float yoffset = LastY - ypos;
+    //  LastX = xpos;
+    //  LastY = ypos;
+    //
+    //  xoffset *= Sensitivity;
+    //  yoffset *= Sensitivity;
+    //
+    //  Yaw += xoffset;
+    //  Pitch += yoffset;
+    //
+    //  /*std::cout << "-----    \n";*/
+    //  /*std::cout << xoffset << " " << yoffset << "\n";*/
+    //  /*std::cout << Yaw << " " << Pitch << "\n";*/
+    //
+    //  if(Pitch > 89.0f){
+    //    Pitch = 89.0f;
+    //  }
+    //
+    //  if(Pitch < -89.0f){
+    //    Pitch = -89.0f;
+    //  }
+    //
+    //  UpdateCameraVector();
+    //}
+    //
+    //void UpdateCameraVector(){
+    //  glm::vec3 direction;
+    //  direction.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+    //  direction.y = sin(glm::radians(Pitch));
+    //  direction.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+    //  Front = glm::normalize(direction);
+    //  Right = glm::normalize(glm::cross(Front, glm::vec3(0.0f, 1.0f, 0.0f))); // world up
+    //  Up = glm::normalize(glm::cross(Right, Front));
+    //}
 }

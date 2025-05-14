@@ -1,5 +1,12 @@
 use wasm_bindgen::prelude::*;
-use web_sys::{WebGl2RenderingContext, WebGlProgram, WebGlVertexArrayObject, HtmlImageElement, console};
+use web_sys::{
+    WebGl2RenderingContext, 
+    WebGlProgram, 
+    WebGlVertexArrayObject, 
+    HtmlImageElement, 
+    console,
+    KeyboardEvent
+};
 use js_sys;
 use crate::shader_utils;
 use crate::camera;
@@ -280,6 +287,9 @@ pub fn draw(
         config.get_canvas().client_width() as f32,
         config.get_canvas().client_height() as f32
         ); 
+
+    //handle_input();
+
     let view_matrix = camera.get_view_matrix();
     let projection_matrix = camera.get_projection_matrix();
 
@@ -299,7 +309,7 @@ fn resize_canvas(
     let previous_width = config.get_width();
     let previous_height = config.get_height();
     if previous_width != current_canvas.client_width() || previous_height != current_canvas.client_height() {
-        console::log_1(&JsValue::from_str("We set a new canvas size one here"));
+        //console::log_1(&JsValue::from_str("We set a new canvas size one here"));
         current_canvas.set_width(current_canvas.client_width() as u32);
         current_canvas.set_height(current_canvas.client_height() as u32);
         context.viewport(0, 0, current_canvas.client_width(), current_canvas.client_height());
@@ -308,4 +318,8 @@ fn resize_canvas(
         // As of now, its working, but this keep firing since I didn't update the real thing
         //config.set_new_canvas_size(current_canvas.client_width(), current_canvas.client_height());
     }
+}
+
+pub fn handle_input(event: KeyboardEvent){
+    console::log_1(&format!("Key pressed: {}", event.key()).into());
 }
