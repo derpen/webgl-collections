@@ -5,6 +5,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::{console,WebGl2RenderingContext,WebGlShader,WebGlProgram, HtmlCanvasElement};
 use crate::scene;
 use crate::shader_utils;
+use crate::camera;
 
 // This entire file is just to set up the Loop
 // Honestly, the file name is very misleading
@@ -74,12 +75,15 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
 pub fn animate(
     context: &WebGl2RenderingContext,
     shader: shader_utils::GlShader,
-    config: GlConfig
+    config: GlConfig,
+    camera: &camera::Camera
 ){
     let start_time = performance().now();
+    // GENUINELY HAVE NO FUCKING CLUE WHY I HAVE TO DO THIS SHIT
     let current_shader = Rc::new(shader.clone());
     let context_rc = Rc::new(context.clone());
     let config_rc = Rc::new(config.clone());
+    let camera_rc = Rc::new(camera.clone());
 
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
@@ -87,7 +91,12 @@ pub fn animate(
     *g.borrow_mut() = Some(Closure::new(move || {
         // Loop shit here
         let elapsed_time = performance().now() - start_time;
-        render_loop(elapsed_time, &*context_rc, (*current_shader).clone(),  (*config_rc).clone());
+        render_loop(elapsed_time, 
+            &*context_rc, 
+            (*current_shader).clone(),  
+            (*config_rc).clone(),
+            &*camera_rc,
+            );
 
         request_animation_frame(f.borrow().as_ref().unwrap());
 
@@ -103,12 +112,18 @@ fn render_loop(
     delta: f64,
     context: &WebGl2RenderingContext,
     shader: shader_utils::GlShader,
-    config: GlConfig
+    config: GlConfig,
+    camera: &camera::Camera
 ) {
     //console::log_1(&JsValue::from_str(&format!("Elapsed Time: {:2} seconds", delta / 1000.0)));
 
     // TODO: Maybe draw shouldn't take any arguments
-    scene::draw(&context, 36, delta / 1000.0, shader, config); // TODO: this vertex count draw needs to be
-                                                       // moved somewhere
-}
+    scene::draw(
+        &context, 
+        36, // TODO: this vertex count draw needs to be moved somewhere
+        delta / 1000.0, 
+        shader, 
+        config,
+        &camera
+        ); }
 

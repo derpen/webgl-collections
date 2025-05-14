@@ -254,7 +254,8 @@ pub fn draw(
     vert_count: i32,
     delta: f64,
     shader: shader_utils::GlShader,
-    config: gl_loop::GlConfig
+    config: gl_loop::GlConfig,
+    camera: &camera::Camera
 ) {
     resize_canvas(&config, &context);
 
@@ -280,18 +281,11 @@ pub fn draw(
 
     let _ = shader.set_mat4("model".to_string(), model);
 
-    // Cringe temporary hack to use camera
-    // TODO: Please make it so that it doesn't have to reinitialize each time
-    let camera = camera::Camera::new( // Wow this naming suck
-        Vector3::new(0.0, 0.0, 5.0),
-        config.get_canvas().client_width() as f32,
-        config.get_canvas().client_height() as f32
-        ); 
-
-    //handle_input();
-
     let view_matrix = camera.get_view_matrix();
     let projection_matrix = camera.get_projection_matrix();
+
+    //let current_position = camera.get_position();
+    //console::log_1(&format!("x: {}, y: {}, z: {}", current_position.x, current_position.y, current_position.z).into());
 
     let _ = shader.set_mat4("view".to_string(), view_matrix);
     let _ = shader.set_mat4("projection".to_string(), projection_matrix);
@@ -320,6 +314,17 @@ fn resize_canvas(
     }
 }
 
-pub fn handle_input(event: KeyboardEvent){
-    console::log_1(&format!("Key pressed: {}", event.key()).into());
+pub fn handle_input(
+    event: KeyboardEvent,
+    camera: &mut camera::Camera
+    ){
+
+    let key_string = event.key();
+    match key_string.as_str() {
+        "w" => camera.process_keyboard(0),
+        "s" => camera.process_keyboard(1),
+        "a" => camera.process_keyboard(2),
+        "d" => camera.process_keyboard(3),
+        _ => console::log_1(&JsValue::from_str("You clicked something other than WASD, bad boy!"))
+    }
 }

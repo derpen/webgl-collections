@@ -1,6 +1,8 @@
 use glm::{Vector3, Mat4, radians};
 use glm::ext::{look_at, perspective};
 
+#[derive(Clone)]
+#[derive(Copy)]
 pub struct Camera {
   pub position: Vector3<f32>,
   pub front: Vector3<f32>,
@@ -23,7 +25,7 @@ impl Camera {
         Camera {
           position: new_position,
           front: Vector3::new(0.0, 0.0, -1.0),
-          right: Vector3::new(1.0, 1.0, 0.0),
+          right: Vector3::new(1.0, 0.0, 0.0),
           up: Vector3::new(0.0, 1.0, 0.0),
           yaw: -90.0,
           pitch: 0.0,
@@ -44,8 +46,23 @@ impl Camera {
         perspective(radians(self.fov), self.width / self.height, 0.001, 1000.0)
     }
 
-    pub fn process_keyboard(&self) {
+    pub fn get_position(&self) -> Vector3<f32> {
+        self.position
+    }
 
+    pub fn process_keyboard(
+        &mut self,
+        direction: i32 // just use int because i'm too lazy to figure out how enums work for now
+                       // lmao
+        ) {
+        let velocity = 2.0;
+        match direction {
+            0 => self.position = (self.position + self.front) * velocity, // W
+            1 => self.position = (self.position - self.front) * velocity, // S
+            2 => self.position = (self.position - self.right) * velocity, // A
+            3 => self.position = (self.position + self.right) * velocity, // D
+            _ => {}
+        }
     }
 
     //void ProcessKeyboard(MoveDirection direction, float deltaTime){

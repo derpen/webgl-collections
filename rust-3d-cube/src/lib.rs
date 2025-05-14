@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{console, WebGl2RenderingContext, Window};
 use wasm_bindgen::JsValue;
+use glm::Vector3;
 
 mod shader_utils;
 mod gl_loop;
@@ -68,16 +69,29 @@ async fn start() -> Result<(), JsValue> {
     context.bind_vertex_array(Some(&vao));
     context.use_program(Some(&cube_shader.get_shader_program().unwrap()));
 
-    // Can we call the callback here?
-    //canvas.add_event_listener_with_callback("keydown")
+    // Le cam
+    let mut camera = camera::Camera::new( // Wow this naming suck
+        Vector3::new(0.0, 0.0, 5.0),
+        canvas.client_width() as f32,
+        canvas.client_height() as f32
+        ); 
+
+    // Input callback
+    // Why is it so hard just to implement callback lmao
     let keydown_callback = Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
         // Handle keydown event
-        scene::handle_input(event);
+        scene::handle_input(event, &mut camera); // I hate that I have to do this here, can this be
+                                             // better somehow
     }) as Box<dyn FnMut(_)>);
     let _ = canvas.clone().add_event_listener_with_callback("keydown", keydown_callback.as_ref().unchecked_ref());
     keydown_callback.forget();
 
-    gl_loop::animate(&context, cube_shader, gl_config);
+    gl_loop::animate(
+        &context, 
+        cube_shader, 
+        gl_config,
+        &camera
+        );
 
     Ok(())
 }
