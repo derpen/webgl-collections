@@ -1,3 +1,10 @@
+# Osaka Cube, now a bit Rusty
+
+## There is supposed to be a preview gif here, please wait for it to load :3
+Yep, I still don't like rust that much (remind me in 3 years)
+
+![Osaka](https://drive.google.com/uc?id=1Djnj5oQc8G1sT0un_rRwCAwJY8T02nYl)
+
 ## How to install
 
 ```sh
