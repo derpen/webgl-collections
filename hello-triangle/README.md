@@ -1,3 +1,11 @@
+# Trying out 
+
+![Triangle](https://drive.google.com/uc?id=1uhute931EOGRUDgCSCyG3HJ5UxI25WPQ)
+
+Trying WebGL on minimal typescript
+
+Below this is the original readme made by the original owner
+
 # Dependency-free Typescript setup
 
 This is a _truly_ minimal, **dependency-free** setup that will provide the skeleton for you to:
