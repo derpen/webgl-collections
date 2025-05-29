@@ -1,5 +1,9 @@
 ## How to install
 
+Oh boy, rust. 
+
+![Triangle again](https://drive.google.com/uc?id=1snVmIA_pu_BCSvUgPLDLZFyVnJXVteMC)
+
 ```sh
 npm install
 ```
