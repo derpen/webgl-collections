@@ -1,3 +1,5 @@
+# Osaka Cube, now a bit Rusty
+
 ## How to install
 
 ## There is supposed to be a preview gif here, please wait for it to load :3
