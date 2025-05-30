@@ -1,8 +1,9 @@
 ## How to install
 
-Oh boy, rust. 
+## There is supposed to be a preview gif here, please wait for it to load :3
+Yep, I still don't like rust that much (remind me in 3 years)
 
-![Triangle again](https://drive.google.com/uc?id=1snVmIA_pu_BCSvUgPLDLZFyVnJXVteMC)
+![Osaka](https://drive.google.com/uc?id=1Djnj5oQc8G1sT0un_rRwCAwJY8T02nYl)
 
 ```sh
 npm install
