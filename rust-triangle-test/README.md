@@ -1,4 +1,4 @@
-# Osaka Cube, now a bit Rusty
+# Triangle, reloaded
 
 Oh boy, rust. 
 
